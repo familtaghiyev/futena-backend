@@ -46,7 +46,7 @@ exports.getSlider = async (req, res) => {
 exports.createSlider = async (req, res) => {
   try {
     const { title, paragraph } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
+    const image = req.file ? req.file.path : req.body.image;
     
     // Validate required fields
     if (!title || !image || !paragraph) {
@@ -79,7 +79,7 @@ exports.createSlider = async (req, res) => {
 exports.updateSlider = async (req, res) => {
   try {
     const { title, paragraph } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
+    const image = req.file ? req.file.path : req.body.image;
     
     const slider = await Slider.findById(req.params.id);
     

@@ -21,7 +21,7 @@ exports.getAllTeamMembers = async (req, res) => {
 exports.createTeamMember = async (req, res) => {
   try {
     const { title, description } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
+    const image = req.file ? req.file.path : req.body.image;
 
     if (!title || !image) {
       return res.status(400).json({
@@ -53,7 +53,7 @@ exports.createTeamMember = async (req, res) => {
 exports.updateTeamMember = async (req, res) => {
   try {
     const { title, description } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
+    const image = req.file ? req.file.path : req.body.image;
 
     const member = await TeamMember.findById(req.params.id);
 

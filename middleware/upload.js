@@ -1,21 +1,29 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-// Create uploads directory if it doesn't exist
-const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-// Configure storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    // Generate unique filename based on route
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+// Determine folder based on route path
+const getFolder = (req) => {
+  if (req.path) {
+    if (req.path.includes('slider')) return 'sliders';
+    else if (req.path.includes('product')) return 'products';
+    else if (req.path.includes('team')) return 'team';
+  }
+  return 'uploads';
+};
+
+// Configure Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
     // Determine prefix based on route path
     let prefix = 'file';
     if (req.path) {
@@ -23,7 +31,19 @@ const storage = multer.diskStorage({
       else if (req.path.includes('product')) prefix = 'product';
       else if (req.path.includes('team')) prefix = 'team';
     }
-    cb(null, `${prefix}-${uniqueSuffix}${path.extname(file.originalname)}`);
+    
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const folder = getFolder(req);
+    
+    const ext = path.extname(file.originalname).slice(1).toLowerCase();
+    const format = ext && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext) ? ext : undefined;
+    
+    return {
+      folder: folder,
+      public_id: `${prefix}-${uniqueSuffix}`,
+      ...(format && { format: format }),
+      resource_type: 'image'
+    };
   }
 });
 

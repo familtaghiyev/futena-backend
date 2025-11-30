@@ -46,7 +46,7 @@ exports.getProduct = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const { description } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
+    const image = req.file ? req.file.path : req.body.image;
     
     // Validate required fields
     if (!image || !description) {
@@ -78,7 +78,7 @@ exports.createProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const { description } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : req.body.image;
+    const image = req.file ? req.file.path : req.body.image;
     
     const product = await Product.findById(req.params.id);
     
