@@ -1,15 +1,14 @@
 const express = require('express');
 require('dotenv').config();
-const connectDB = require('./config/database');
+const connectDB = require('../config/database');
 const multer = require('multer');
 
 // Connect to database
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// CORS Middleware - Enhanced
+// CORS Middleware - Enhanced for Vercel
 app.use((req, res, next) => {
   // Default allowed origins (development + production)
   const defaultOrigins = [
@@ -61,7 +60,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from uploads directory
 const path = require('path');
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 app.get('/', (req, res) => {
@@ -69,12 +68,12 @@ app.get('/', (req, res) => {
 });
 
 // API Routes
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/ai-models', require('./routes/aiModelRoutes'));
-app.use('/api/sliders', require('./routes/sliderRoutes'));
-app.use('/api/products', require('./routes/productRoutes'));
-app.use('/api/faqs', require('./routes/faqRoutes'));
-app.use('/api/team', require('./routes/teamRoutes'));
+app.use('/api/admin', require('../routes/adminRoutes'));
+app.use('/api/ai-models', require('../routes/aiModelRoutes'));
+app.use('/api/sliders', require('../routes/sliderRoutes'));
+app.use('/api/products', require('../routes/productRoutes'));
+app.use('/api/faqs', require('../routes/faqRoutes'));
+app.use('/api/team', require('../routes/teamRoutes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -109,10 +108,6 @@ app.use((req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`MongoDB URI: ${process.env.MONGODB_URI ? 'Configured' : 'Using default'}`);
-});
+// Export for Vercel serverless function
+module.exports = app;
 
