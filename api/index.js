@@ -10,35 +10,34 @@ const app = express();
 
 // CORS Middleware - Enhanced for Vercel
 app.use((req, res, next) => {
-  // Default allowed origins (development + production)
-  const defaultOrigins = [
+  // Get origin from request
+  const origin = req.headers.origin;
+  
+  // Default allowed origins
+  const allowedOrigins = [
     'http://localhost:5173',
     'https://futena-frontend.vercel.app',
   ];
   
-  const allowedOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-    : defaultOrigins;
+  // Add custom origins from environment variable
+  if (process.env.ALLOWED_ORIGINS) {
+    const customOrigins = process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim());
+    allowedOrigins.push(...customOrigins);
+  }
   
-  const origin = req.headers.origin || req.headers.referer?.split('/').slice(0, 3).join('/');
-  
-  // Allow requests from allowed origins
-  if (origin) {
-    if (allowedOrigins.includes(origin)) {
-      res.header('Access-Control-Allow-Origin', origin);
-    } else if (process.env.NODE_ENV !== 'production' && origin.includes('localhost')) {
-      // Allow any localhost origin in development
-      res.header('Access-Control-Allow-Origin', origin);
-    } else if (process.env.NODE_ENV === 'production' && origin.includes('vercel.app')) {
-      // Allow any vercel.app origin in production (for safety)
-      res.header('Access-Control-Allow-Origin', origin);
-    } else if (process.env.NODE_ENV === 'production') {
-      // In production, allow the frontend origin
+  // Set CORS headers - Always set in production for frontend
+  if (process.env.NODE_ENV === 'production') {
+    // In production, always allow frontend origin
+    if (origin === 'https://futena-frontend.vercel.app' || allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin || 'https://futena-frontend.vercel.app');
+    } else {
       res.header('Access-Control-Allow-Origin', 'https://futena-frontend.vercel.app');
     }
-  } else if (process.env.NODE_ENV === 'production') {
-    // If no origin header, allow the frontend in production
-    res.header('Access-Control-Allow-Origin', 'https://futena-frontend.vercel.app');
+  } else {
+    // In development, allow localhost or allowed origins
+    if (origin && (origin.includes('localhost') || allowedOrigins.includes(origin))) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
   }
   
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
@@ -46,9 +45,9 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Max-Age', '86400'); // 24 hours
   
-  // Handle preflight requests
+  // Handle preflight OPTIONS requests - MUST return early
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    return res.status(200).end();
   }
   
   next();
@@ -109,5 +108,7 @@ app.use((req, res) => {
 });
 
 // Export for Vercel serverless function
+// @vercel/node supports Express app directly
 module.exports = app;
+
 
