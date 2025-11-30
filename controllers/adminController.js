@@ -21,7 +21,7 @@ exports.register = async (req, res) => {
     if (existingAdmin) {
       return res.status(400).json({
         success: false,
-        message: 'Admin with this email or username already exist'
+        message: 'Admin with this email or username already exists'
       });
     }
 

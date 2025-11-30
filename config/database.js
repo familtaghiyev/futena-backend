@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
+    // If already connected, return
+    if (mongoose.connection.readyState === 1) {
+      return;
+    }
+    
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/frutena';
     
     if (!process.env.MONGODB_URI) {
@@ -18,7 +23,10 @@ const connectDB = async () => {
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
     console.error('Please check your MONGODB_URI environment variable');
-    process.exit(1);
+    // Don't exit process in serverless environment (Vercel)
+    // process.exit(1) will crash the serverless function
+    // Just throw error so it can be handled by the application
+    throw error;
   }
 };
 

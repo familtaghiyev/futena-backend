@@ -2,13 +2,12 @@ const express = require('express');
 require('dotenv').config();
 const connectDB = require('../config/database');
 const multer = require('multer');
-
-// Connect to database
-connectDB();
+const mongoose = require('mongoose');
 
 const app = express();
 
-// CORS Middleware - Enhanced for Vercel
+// CORS Middleware - MUST be first, before any other middleware
+// Handle OPTIONS requests immediately without database connection
 app.use((req, res, next) => {
   // Get origin from request
   const origin = req.headers.origin;
@@ -45,11 +44,34 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Max-Age', '86400'); // 24 hours
   
-  // Handle preflight OPTIONS requests - MUST return early
+  // Handle preflight OPTIONS requests - MUST return early, before database connection
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
   
+  next();
+});
+
+// Connect to database - Lazy connection (only when needed)
+// Don't block OPTIONS requests with database connection
+let dbConnected = false;
+const ensureDBConnection = async () => {
+  if (!dbConnected && mongoose.connection.readyState === 0) {
+    try {
+      await connectDB();
+      dbConnected = true;
+    } catch (error) {
+      console.error('Database connection error:', error);
+      // Don't exit process in serverless - just log error
+    }
+  }
+};
+
+// Middleware to ensure DB connection for non-OPTIONS requests
+app.use(async (req, res, next) => {
+  if (req.method !== 'OPTIONS') {
+    await ensureDBConnection();
+  }
   next();
 });
 
