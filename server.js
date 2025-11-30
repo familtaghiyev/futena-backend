@@ -14,13 +14,7 @@ app.use((req, res, next) => {
   // Default allowed origins (development + production)
   const defaultOrigins = [
     'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:5174',
-    'https://frutena-frountend.vercel.app', // Old production frontend
-    'https://frutena-frontend-three.vercel.app', // New production frontend
+    'https://futena-frontend.vercel.app',
   ];
   
   const allowedOrigins = process.env.ALLOWED_ORIGINS 
