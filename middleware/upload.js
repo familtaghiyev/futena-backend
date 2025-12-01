@@ -4,16 +4,26 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 // Configure Cloudinary
-cloudinary.config({
+const cloudinaryConfig = {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
-});
+};
 
 // Check if Cloudinary is configured
-if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-  console.warn('Warning: Cloudinary credentials not found. Image uploads may fail.');
+if (!cloudinaryConfig.cloud_name || !cloudinaryConfig.api_key || !cloudinaryConfig.api_secret) {
+  console.error('❌ ERROR: Cloudinary credentials are missing!');
+  console.error('Required environment variables:');
+  console.error('  - CLOUDINARY_CLOUD_NAME:', cloudinaryConfig.cloud_name ? '✅ Set' : '❌ Missing');
+  console.error('  - CLOUDINARY_API_KEY:', cloudinaryConfig.api_key ? '✅ Set' : '❌ Missing');
+  console.error('  - CLOUDINARY_API_SECRET:', cloudinaryConfig.api_secret ? '✅ Set' : '❌ Missing');
+  console.error('Please set these in your Vercel/Render environment variables.');
+} else {
+  console.log('✅ Cloudinary configured successfully');
+  console.log('Cloud Name:', cloudinaryConfig.cloud_name);
 }
+
+cloudinary.config(cloudinaryConfig);
 
 // Determine folder based on route path
 const getFolder = (req) => {

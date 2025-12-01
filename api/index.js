@@ -95,6 +95,8 @@ app.use('/api/sliders', require('../routes/sliderRoutes'));
 app.use('/api/products', require('../routes/productRoutes'));
 app.use('/api/faqs', require('../routes/faqRoutes'));
 app.use('/api/team', require('../routes/teamRoutes'));
+app.use('/api/gallery', require('../routes/galleryRoutes'));
+app.use('/api/news', require('../routes/newsRoutes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
