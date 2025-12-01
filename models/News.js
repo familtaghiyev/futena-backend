@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
 
-const productSchema = new mongoose.Schema({
+const newsSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: false, // Made optional for existing products
+    required: [true, 'Title is required'],
     trim: true,
-    maxlength: [200, 'Title cannot exceed 200 characters'],
-    default: '' // Default empty string
+    maxlength: [200, 'Title cannot exceed 200 characters']
   },
   description: {
     type: String,
@@ -23,5 +22,5 @@ const productSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Product', productSchema);
+module.exports = mongoose.model('News', newsSchema);
 

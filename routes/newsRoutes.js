@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const productController = require('../controllers/productController');
+const newsController = require('../controllers/newsController');
 const authMiddleware = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
@@ -18,14 +18,14 @@ const handleUpload = (req, res, next) => {
   });
 };
 
-// Public route - Get all products (for frontend display)
-router.get('/', productController.getAllProducts);
+// Public route - Get all news (for frontend display) - NO AUTH REQUIRED
+router.get('/', newsController.getAllNews);
 
 // Protected routes - Admin operations (require authentication)
-router.get('/:id', authMiddleware, productController.getProduct);
-router.post('/', authMiddleware, handleUpload, productController.createProduct);
-router.put('/:id', authMiddleware, handleUpload, productController.updateProduct);
-router.delete('/:id', authMiddleware, productController.deleteProduct);
+router.get('/:id', authMiddleware, newsController.getNews);
+router.post('/', authMiddleware, handleUpload, newsController.createNews);
+router.put('/:id', authMiddleware, handleUpload, newsController.updateNews);
+router.delete('/:id', authMiddleware, newsController.deleteNews);
 
 module.exports = router;
 

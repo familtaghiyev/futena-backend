@@ -45,8 +45,10 @@ exports.getProduct = async (req, res) => {
 // Create Product
 exports.createProduct = async (req, res) => {
   try {
-    const { description } = req.body;
+    const { title, description } = req.body;
     const image = req.file ? req.file.path : req.body.image;
+    
+    console.log('Create Product - Request body:', { title, description, image: image ? 'present' : 'missing' });
     
     // Validate required fields
     if (!image || !description) {
@@ -57,9 +59,12 @@ exports.createProduct = async (req, res) => {
     }
     
     const product = await Product.create({
+      title: title || '', // Ensure title is always a string
       description,
       image
     });
+    
+    console.log('Product created:', product);
     
     res.status(201).json({
       success: true,
@@ -67,6 +72,7 @@ exports.createProduct = async (req, res) => {
       data: product
     });
   } catch (error) {
+    console.error('Error creating product:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Error creating product'
@@ -77,8 +83,10 @@ exports.createProduct = async (req, res) => {
 // Update Product
 exports.updateProduct = async (req, res) => {
   try {
-    const { description } = req.body;
+    const { title, description } = req.body;
     const image = req.file ? req.file.path : req.body.image;
+    
+    console.log('Update Product - Request body:', { title, description, image: image ? 'present' : 'missing' });
     
     const product = await Product.findById(req.params.id);
     
@@ -90,10 +98,13 @@ exports.updateProduct = async (req, res) => {
     }
     
     // Update fields
+    if (title !== undefined) product.title = title || '';
     if (description !== undefined) product.description = description;
     if (image !== undefined) product.image = image;
     
     await product.save();
+    
+    console.log('Product updated:', product);
     
     res.status(200).json({
       success: true,
@@ -101,6 +112,7 @@ exports.updateProduct = async (req, res) => {
       data: product
     });
   } catch (error) {
+    console.error('Error updating product:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Error updating product'

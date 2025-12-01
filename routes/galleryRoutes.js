@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const productController = require('../controllers/productController');
+const galleryController = require('../controllers/galleryController');
 const authMiddleware = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
@@ -18,14 +18,14 @@ const handleUpload = (req, res, next) => {
   });
 };
 
-// Public route - Get all products (for frontend display)
-router.get('/', productController.getAllProducts);
+// Public route - Get all gallery images (for frontend display) - NO AUTH REQUIRED
+router.get('/', galleryController.getAllGalleryImages);
 
 // Protected routes - Admin operations (require authentication)
-router.get('/:id', authMiddleware, productController.getProduct);
-router.post('/', authMiddleware, handleUpload, productController.createProduct);
-router.put('/:id', authMiddleware, handleUpload, productController.updateProduct);
-router.delete('/:id', authMiddleware, productController.deleteProduct);
+router.get('/:id', authMiddleware, galleryController.getGalleryImage);
+router.post('/', authMiddleware, handleUpload, galleryController.createGalleryImage);
+router.put('/:id', authMiddleware, handleUpload, galleryController.updateGalleryImage);
+router.delete('/:id', authMiddleware, galleryController.deleteGalleryImage);
 
 module.exports = router;
 

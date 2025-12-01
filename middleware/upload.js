@@ -10,12 +10,19 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Check if Cloudinary is configured
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  console.warn('Warning: Cloudinary credentials not found. Image uploads may fail.');
+}
+
 // Determine folder based on route path
 const getFolder = (req) => {
   if (req.path) {
     if (req.path.includes('slider')) return 'sliders';
     else if (req.path.includes('product')) return 'products';
     else if (req.path.includes('team')) return 'team';
+    else if (req.path.includes('gallery')) return 'gallery';
+    else if (req.path.includes('news')) return 'news';
   }
   return 'uploads';
 };
@@ -30,6 +37,8 @@ const storage = new CloudinaryStorage({
       if (req.path.includes('slider')) prefix = 'slider';
       else if (req.path.includes('product')) prefix = 'product';
       else if (req.path.includes('team')) prefix = 'team';
+      else if (req.path.includes('gallery')) prefix = 'gallery';
+      else if (req.path.includes('news')) prefix = 'news';
     }
     
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
