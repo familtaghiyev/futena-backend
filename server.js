@@ -15,6 +15,8 @@ app.use((req, res, next) => {
   const defaultOrigins = [
     'http://localhost:5173',
     'https://futena-frontend.vercel.app',
+    'https://frutena.com',
+    'https://www.frutena.com',
   ];
   
   const allowedOrigins = process.env.ALLOWED_ORIGINS 
@@ -30,16 +32,16 @@ app.use((req, res, next) => {
     } else if (process.env.NODE_ENV !== 'production' && origin.includes('localhost')) {
       // Allow any localhost origin in development
       res.header('Access-Control-Allow-Origin', origin);
-    } else if (process.env.NODE_ENV === 'production' && origin.includes('vercel.app')) {
-      // Allow any vercel.app origin in production (for safety)
+    } else if (process.env.NODE_ENV === 'production' && (origin.includes('vercel.app') || origin.includes('frutena.com'))) {
+      // Allow vercel.app or frutena.com origin in production
       res.header('Access-Control-Allow-Origin', origin);
     } else if (process.env.NODE_ENV === 'production') {
-      // In production, allow the frontend origin
-      res.header('Access-Control-Allow-Origin', 'https://futena-frontend.vercel.app');
+      // In production, allow the custom domain or vercel domain
+      res.header('Access-Control-Allow-Origin', 'https://frutena.com');
     }
   } else if (process.env.NODE_ENV === 'production') {
-    // If no origin header, allow the frontend in production
-    res.header('Access-Control-Allow-Origin', 'https://futena-frontend.vercel.app');
+    // If no origin header, allow the custom domain in production
+    res.header('Access-Control-Allow-Origin', 'https://frutena.com');
   }
   
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');

@@ -16,6 +16,8 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     'http://localhost:5173',
     'https://futena-frontend.vercel.app',
+    'https://frutena.com',
+    'https://www.frutena.com',
   ];
   
   // Add custom origins from environment variable
@@ -26,11 +28,14 @@ app.use((req, res, next) => {
   
   // Set CORS headers - Always set in production for frontend
   if (process.env.NODE_ENV === 'production') {
-    // In production, always allow frontend origin
-    if (origin === 'https://futena-frontend.vercel.app' || allowedOrigins.includes(origin)) {
-      res.header('Access-Control-Allow-Origin', origin || 'https://futena-frontend.vercel.app');
+    // In production, allow vercel domain, custom domain, or any origin from ALLOWED_ORIGINS
+    if (origin && (origin.includes('frutena.com') || origin.includes('futena-frontend.vercel.app') || allowedOrigins.includes(origin))) {
+      res.header('Access-Control-Allow-Origin', origin);
+    } else if (allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin);
     } else {
-      res.header('Access-Control-Allow-Origin', 'https://futena-frontend.vercel.app');
+      // Default to custom domain if available, otherwise vercel domain
+      res.header('Access-Control-Allow-Origin', 'https://frutena.com');
     }
   } else {
     // In development, allow localhost or allowed origins
