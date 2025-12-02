@@ -79,6 +79,7 @@ app.use('/api/faqs', require('./routes/faqRoutes'));
 app.use('/api/team', require('./routes/teamRoutes'));
 app.use('/api/gallery', require('./routes/galleryRoutes'));
 app.use('/api/news', require('./routes/newsRoutes'));
+app.use('/api/usage-area', require('./routes/usageAreaRoutes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

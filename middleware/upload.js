@@ -33,6 +33,7 @@ const getFolder = (req) => {
     else if (req.path.includes('team')) return 'team';
     else if (req.path.includes('gallery')) return 'gallery';
     else if (req.path.includes('news')) return 'news';
+    else if (req.path.includes('usage-area')) return 'usage-area';
   }
   return 'uploads';
 };
@@ -49,6 +50,7 @@ const storage = new CloudinaryStorage({
       else if (req.path.includes('team')) prefix = 'team';
       else if (req.path.includes('gallery')) prefix = 'gallery';
       else if (req.path.includes('news')) prefix = 'news';
+      else if (req.path.includes('usage-area')) prefix = 'usage-area';
     }
     
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
