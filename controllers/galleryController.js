@@ -45,15 +45,6 @@ exports.getGalleryImage = async (req, res) => {
 // Create Gallery Image
 exports.createGalleryImage = async (req, res) => {
   try {
-    console.log('Create gallery image request:', {
-      hasFile: !!req.file,
-      body: req.body,
-      fileInfo: req.file ? {
-        path: req.file.path,
-        filename: req.file.filename,
-        originalname: req.file.originalname
-      } : null
-    });
 
     const { alt } = req.body;
     const image = req.file ? req.file.path : req.body.image;

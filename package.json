@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "migrate:languages": "node scripts/migrateLanguageData.js",
+    "translate:usage-areas": "node scripts/translateUsageAreas.js"
   },
   "keywords": [],
   "author": "",

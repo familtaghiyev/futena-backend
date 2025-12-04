@@ -18,11 +18,12 @@ const handleUpload = (req, res, next) => {
   });
 };
 
-// Public route - Get all news (for frontend display) - NO AUTH REQUIRED
+// Public routes - Get all news and single news (for frontend display) - NO AUTH REQUIRED
 router.get('/', newsController.getAllNews);
+router.get('/:id', newsController.getNews);
 
 // Protected routes - Admin operations (require authentication)
-router.get('/:id', authMiddleware, newsController.getNews);
+// Note: Admin routes should be defined before public routes if they need different paths
 router.post('/', authMiddleware, handleUpload, newsController.createNews);
 router.put('/:id', authMiddleware, handleUpload, newsController.updateNews);
 router.delete('/:id', authMiddleware, newsController.deleteNews);
