@@ -115,6 +115,20 @@ const transformToLanguage = (obj, lang = 'en') => {
   }
   // If old format exists, it will remain as is (backward compatibility)
   
+  // Check if new format exists for name (certificates)
+  const hasNewNameFormat = transformed.name_en !== undefined || transformed.name_az !== undefined || transformed.name_ru !== undefined;
+  
+  // Transform name fields
+  if (hasNewNameFormat) {
+    // New format: use language-specific fields with smart fallback
+    transformed.name = getValueWithFallback(transformed, 'name', language);
+    // Remove language-specific fields from response
+    delete transformed.name_en;
+    delete transformed.name_az;
+    delete transformed.name_ru;
+  }
+  // If old format exists, it will remain as is (backward compatibility)
+  
   return transformed;
 };
 

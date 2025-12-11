@@ -347,12 +347,40 @@ const translateTitleParagraph = async (title, paragraph, sourceLanguage = 'en') 
   return result;
 };
 
+// Generic translation function for name field (Certificates)
+const translateName = async (name, sourceLanguage = 'en') => {
+  const languages = ['en', 'az', 'ru'];
+  const result = {
+    name_en: '',
+    name_az: '',
+    name_ru: ''
+  };
+
+  result[`name_${sourceLanguage}`] = name || '';
+
+  const targetLanguages = languages.filter(lang => lang !== sourceLanguage);
+
+  for (const lang of targetLanguages) {
+    try {
+      if (name) {
+        result[`name_${lang}`] = await translateText(name, lang, sourceLanguage);
+      }
+    } catch (error) {
+      console.error(`Error translating to ${lang}:`, error);
+      result[`name_${lang}`] = '';
+    }
+  }
+
+  return result;
+};
+
 module.exports = {
   translateText,
   translateToAllLanguages,
   translateNewsContent,
   translateTitleDescription,
   translateQuestionAnswer,
-  translateTitleParagraph
+  translateTitleParagraph,
+  translateName
 };
 
