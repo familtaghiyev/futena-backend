@@ -34,6 +34,7 @@ const getFolder = (req) => {
     else if (req.path.includes('gallery')) return 'gallery';
     else if (req.path.includes('news')) return 'news';
     else if (req.path.includes('usage-area')) return 'usage-area';
+    else if (req.path.includes('certificate')) return 'certificates';
   }
   return 'uploads';
 };
@@ -51,30 +52,74 @@ const storage = new CloudinaryStorage({
       else if (req.path.includes('gallery')) prefix = 'gallery';
       else if (req.path.includes('news')) prefix = 'news';
       else if (req.path.includes('usage-area')) prefix = 'usage-area';
+      else if (req.path.includes('certificate')) prefix = 'certificate';
     }
     
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const folder = getFolder(req);
     
     const ext = path.extname(file.originalname).slice(1).toLowerCase();
+    const isPdf = ext === 'pdf';
     const format = ext && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext) ? ext : undefined;
     
     return {
       folder: folder,
       public_id: `${prefix}-${uniqueSuffix}`,
       ...(format && { format: format }),
-      resource_type: 'image'
+      resource_type: isPdf ? 'raw' : 'image' // PDFs are raw files in Cloudinary
     };
   }
 });
 
-// File filter - only images
+// File filter - images and PDFs (for certificates)
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
-
-  if (mimetype && extname) {
+  const allowedImageTypes = /jpeg|jpg|png|gif|webp/;
+  const allowedPdfTypes = /pdf/;
+  
+  const extname = path.extname(file.originalname).toLowerCase();
+  const isImage = allowedImageTypes.test(extname);
+  const isPdf = allowedPdfTypes.test(extname);
+  const mimetype = file.mimetype || '';
+  
+  // Check if it's a PDF field or logo field (certificate routes use these field names)
+  const isPdfField = file.fieldname === 'pdf';
+  const isLogoField = file.fieldname === 'logo';
+  
+  // If it's PDF field, only allow PDFs
+  if (isPdfField) {
+    if (isPdf || mimetype === 'application/pdf' || mimetype.includes('pdf')) {
+      return cb(null, true);
+    } else {
+      return cb(new Error('PDF field only accepts PDF files!'));
+    }
+  }
+  
+  // If it's logo field, only allow images
+  if (isLogoField) {
+    if (isImage || mimetype.startsWith('image/')) {
+      return cb(null, true);
+    } else {
+      return cb(new Error('Logo field only accepts image files!'));
+    }
+  }
+  
+  // Check if it's a certificate route (fallback for other fields)
+  const isCertificateRoute = (req.path && req.path.includes('certificate')) || 
+                             (req.originalUrl && req.originalUrl.includes('certificate')) ||
+                             (req.baseUrl && req.baseUrl.includes('certificate')) ||
+                             (req.url && req.url.includes('certificate'));
+  
+  // For certificate routes, allow both images and PDFs
+  if (isCertificateRoute) {
+    if (isImage || isPdf || mimetype === 'application/pdf' || mimetype.startsWith('image/')) {
+      return cb(null, true);
+    } else {
+      return cb(new Error('Only image and PDF files are allowed!'));
+    }
+  }
+  
+  // For other routes, only allow images
+  if (isImage && (mimetype.startsWith('image/') || allowedImageTypes.test(mimetype))) {
     return cb(null, true);
   } else {
     cb(new Error('Only image files are allowed!'));
@@ -84,7 +129,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 10 * 1024 * 1024 // 10MB limit (increased for PDFs)
   },
   fileFilter: fileFilter
 });

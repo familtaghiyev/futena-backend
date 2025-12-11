@@ -103,6 +103,7 @@ app.use('/api/team', require('../routes/teamRoutes'));
 app.use('/api/gallery', require('../routes/galleryRoutes'));
 app.use('/api/news', require('../routes/newsRoutes'));
 app.use('/api/usage-area', require('../routes/usageAreaRoutes'));
+app.use('/api/certificates', require('../routes/certificateRoutes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
